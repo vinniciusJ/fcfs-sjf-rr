@@ -14,6 +14,9 @@ class Queue:
     def size(self):
         return len(self.queue)
 
+    def sort(self):
+        self.queue.sort(reverse=True)
+
     def front(self):
         return self.queue[0]
 

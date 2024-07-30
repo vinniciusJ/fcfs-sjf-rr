@@ -1,0 +1,4 @@
+Processo 1: (0, 5)
+Processo 2: (2, 3)
+Processo 3: (4, 1)
+Processo 4: (6, 2)

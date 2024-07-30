@@ -1,22 +1,12 @@
 import threading
 import time
-from utils.log import log
 from colorama import Fore
 
+from utils.log import log
 from utils.queue import Queue
+from utils.process import add_process_to_queue
 
-
-def add_process_to_queue(processes, process_queue):
-    def add_process(process):
-        process_queue.enqueue(process)
-        log(f'{process.name} entrou na fila de execução', Fore.BLUE)
-
-    for process in processes:
-        timer = threading.Timer(process.arrival_time, add_process, args=[process])
-        timer.start()
-
-
-def execute_process(process_queue):
+def execute_processes(process_queue):
     while True:
         if not process_queue.is_empty():
             process = process_queue.dequeue()
@@ -37,7 +27,7 @@ def start_fcfs_scheduler(processes):
     queue = Queue()
 
     add_process_thread = threading.Thread(target=add_process_to_queue, args=(processes, queue))
-    execute_process_thread = threading.Thread(target=execute_process, args=(queue,))
+    execute_process_thread = threading.Thread(target=execute_processes, args=(queue,))
 
     add_process_thread.start()
     execute_process_thread.start()

@@ -1,3 +1,7 @@
+import threading
+from colorama import Fore
+
+from utils.log import log
 class Process:
     def __init__(self, name, arrival_time, runtime):
         self.name = name
@@ -28,3 +32,12 @@ def read_processes_from_file(filename):
             processes.append(Process(name, arrival_time, runtime))
 
     return processes
+
+def add_process_to_queue(processes, process_queue):
+    def add_process(process):
+        process_queue.enqueue(process)
+        log(f'{process.name} entrou na fila de execução', Fore.BLUE)
+
+    for process in processes:
+        timer = threading.Timer(process.arrival_time, add_process, args=[process])
+        timer.start()

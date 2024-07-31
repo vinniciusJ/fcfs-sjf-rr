@@ -35,6 +35,7 @@ class Process:
     def __ne__(self, other):
         return self.runtime != other.runtime
 
+
 def read_processes_from_file(filename):
     processes = []
 
@@ -53,6 +54,9 @@ def read_processes_from_file(filename):
 
     return processes
 
+is_finished_flag = threading.Event()
+def handle_processes_finished():
+    is_finished_flag.set()
 def add_process_to_queue(processes, process_queue, sorted=False):
     def add_process(process):
         process_queue.enqueue(process)
@@ -66,8 +70,13 @@ def add_process_to_queue(processes, process_queue, sorted=False):
         timer.start()
 
 def execute_non_preemptive_processes(process_queue):
-    while True:
+    timer = threading.Timer(5, handle_processes_finished)
+    timer.start()
+
+    while not is_finished_flag.is_set():
         if not process_queue.is_empty():
+            timer.cancel()
+
             process = process_queue.dequeue()
 
             while process.runtime > 0:
@@ -78,8 +87,14 @@ def execute_non_preemptive_processes(process_queue):
 
             log(f'{process.name} finalizado com sucesso!', Fore.GREEN)
             process.set_finished()
+
+            timer = threading.Timer(5, handle_processes_finished)
+            timer.start()
         else:
             time.sleep(1)
+
+    log(f'Finalizando scheduler pois não há mais processos na fila', Fore.YELLOW)
+    is_finished_flag.clear()
 
 def start_non_preemptive_scheduler(processes, sorted=False):
     queue = Queue()
